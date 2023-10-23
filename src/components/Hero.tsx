@@ -1,9 +1,25 @@
 import Image from "next/image";
+import { Image as SanityImage } from "sanity";
 import DonationButton from "./DonationButton";
 import { FaStar } from "react-icons/fa";
 import { client } from "@/utils/configSanity";
+import { urlForImage } from "../../sanity/lib/image";
 
-const Hero = () => {
+type HeroType = {
+  _id: string;
+  welcomeMessage: string;
+  imageUrl: SanityImage[];
+  _createdAt: string;
+  _updatedAt: string;
+};
+
+async function getData() {
+  const query = `*[_type == "hero"]`;
+  const data = await client.fetch(query);
+  return data as HeroType[];
+}
+
+const Hero = async () => {
   const pink_gradiant =
     "bg-gradient-to-r from-pink-300 to-pink-600 filter blur-[900px]";
   const white_gradiant = "bg-white bg-opacity-60 filter blur-[750px]";
@@ -12,6 +28,10 @@ const Hero = () => {
   const bg_discount_gradient = "bg-gradient-to-tr from-gray-700 to-indigo-900";
   const text_gradient =
     " bg-gradient-to-br from-teal-100 via-teal-200 to-teal-500 text-transparent bg-clip-text";
+
+  const data = await getData();
+  const heroText = data?.[0].welcomeMessage.split(" ");
+  console.log(heroText);
 
   return (
     <section id="home" className={`flex md:flex-row flex-col sm:py-16 py-6`}>
@@ -32,8 +52,8 @@ const Hero = () => {
 
         <div className="flex flex-row justify-between items-center w-full">
           <h1 className="flex-1 font-poppins font-semibold ss:text-[72px] text-[52px] text-white ss:leading-[100.8px] leading-[75px]">
-            Moga <br className="sm:block hidden" />{" "}
-            <span className={`${text_gradient}`}>Charity</span>{" "}
+            {heroText?.[0]} <br className="sm:block hidden" />{" "}
+            <span className={`${text_gradient}`}>{heroText?.[1]}</span>{" "}
           </h1>
           <div className="ss:flex hidden md:mr-4 mr-0">
             <DonationButton />
@@ -41,7 +61,7 @@ const Hero = () => {
         </div>
 
         <h1 className="font-poppins font-semibold ss:text-[68px] text-[52px] text-white ss:leading-[100.8px] leading-[75px] w-full">
-          Association
+          {heroText?.[2]}
         </h1>
         <p
           className={`font-poppins font-normal text-dimWhite text-[18px] leading-[30.8px] max-w-[470px] mt-5`}
@@ -57,7 +77,7 @@ const Hero = () => {
         className={`flex-1 flex justify-center items-center md:my-0 my-10 relative`}
       >
         <Image
-          src={"/donation.png"}
+          src={urlForImage(data?.[0].imageUrl?.[0]).url()}
           alt="billing"
           className="w-[100%] h-[100%] relative z-[5]"
           width={500}
