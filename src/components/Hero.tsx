@@ -1,6 +1,7 @@
 import Image from "next/image";
 import DonationButton from "./DonationButton";
 import { FaStar } from "react-icons/fa";
+import { client } from "@/utils/configSanity";
 
 const Hero = () => {
   const pink_gradiant =
